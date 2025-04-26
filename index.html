@@ -1,0 +1,441 @@
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catatan Laporan Keuangan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <header class="bg-blue-700 text-white shadow-md">
+      <div
+        class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-2xl font-semibold flex items-center gap-2">
+          <i class="fas fa-file-invoice-dollar"></i> Catatan Laporan Keuangan
+        </h1>
+      </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto px-4 py-8 w-full">
+      <section class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">
+          Tambah Catatan Baru
+        </h2>
+        <form id="financeForm" class="space-y-6">
+          <div>
+            <label for="tanggal" class="block text-gray-700 font-medium mb-1"
+              >Tanggal</label
+            >
+            <input
+              type="date"
+              id="tanggal"
+              name="tanggal"
+              required
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-1"
+              >Catatan (Keterangan & Harga)</label
+            >
+            <div id="catatanContainer" class="space-y-3">
+              <div class="flex gap-2 items-center">
+                <input
+                  type="text"
+                  name="keterangan[]"
+                  placeholder="Contoh: Pembelian bahan baku"
+                  required
+                  class="flex-grow border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <input
+                  type="number"
+                  name="harga[]"
+                  min="0"
+                  step="1000"
+                  placeholder="Harga (Rp)"
+                  required
+                  class="w-36 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  id="addCatatanBtn"
+                  aria-label="Tambah catatan"
+                  title="Tambah catatan"
+                  class="bg-green-600 text-white px-3 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="tipe" class="block text-gray-700 font-medium mb-1"
+              >Tipe</label
+            >
+            <select
+              id="tipe"
+              name="tipe"
+              required
+              class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled selected>Pilih tipe</option>
+              <option value="pemasukan">Pemasukan</option>
+              <option value="pengeluaran">Pengeluaran</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="bg-blue-700 text-white px-5 py-2 rounded-md hover:bg-blue-800 transition-colors w-full sm:w-auto"
+          >
+            Tambah Catatan
+          </button>
+        </form>
+      </section>
+
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">
+          Daftar Catatan Keuangan
+        </h2>
+        <div class="overflow-x-auto rounded-lg shadow bg-white">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-blue-700 text-white">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-left text-sm font-semibold"
+                >
+                  Tanggal
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-left text-sm font-semibold"
+                >
+                  Keterangan
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-left text-sm font-semibold"
+                >
+                  Tipe
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-right text-sm font-semibold"
+                >
+                  Harga (Rp)
+                </th>
+                <th
+                  scope="col"
+                  class="px-4 py-3 text-center text-sm font-semibold"
+                >
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody id="catatanList" class="divide-y divide-gray-200">
+              <tr class="text-center text-gray-500">
+                <td colspan="5" class="py-6">Belum ada catatan keuangan.</td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-gray-100 font-semibold text-gray-800">
+              <tr>
+                <td colspan="3" class="px-4 py-3 text-right">
+                  Total Pemasukan:
+                </td>
+                <td id="totalPemasukan" class="px-4 py-3 text-right">Rp 0</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td colspan="3" class="px-4 py-3 text-right">
+                  Total Pengeluaran:
+                </td>
+                <td id="totalPengeluaran" class="px-4 py-3 text-right">Rp 0</td>
+                <td></td>
+              </tr>
+              <tr class="bg-blue-700 text-white font-bold">
+                <td colspan="3" class="px-4 py-3 text-right">Saldo Bersih:</td>
+                <td id="saldoBersih" class="px-4 py-3 text-right">Rp 0</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-blue-700 text-white text-center py-4 mt-12">
+      <p>© 2024 Catatan Laporan Keuangan. Dibuat dengan Tailwind CSS.</p>
+    </footer>
+
+    <script>
+      // Data persistence key
+      const STORAGE_KEY = "catatanLaporanKeuanganData";
+
+      const form = document.getElementById("financeForm");
+      const catatanList = document.getElementById("catatanList");
+      const totalPemasukanEl = document.getElementById("totalPemasukan");
+      const totalPengeluaranEl = document.getElementById("totalPengeluaran");
+      const saldoBersihEl = document.getElementById("saldoBersih");
+      const catatanContainer = document.getElementById("catatanContainer");
+      let addCatatanBtn = document.getElementById("addCatatanBtn");
+
+      let catatanData = [];
+
+      // Load data from localStorage
+      function loadData() {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) {
+          try {
+            catatanData = JSON.parse(data);
+          } catch {
+            catatanData = [];
+          }
+        }
+      }
+
+      // Save data to localStorage
+      function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(catatanData));
+      }
+
+      function formatRupiah(number) {
+        return "Rp " + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      }
+
+      function renderList() {
+        catatanList.innerHTML = "";
+        if (catatanData.length === 0) {
+          const tr = document.createElement("tr");
+          tr.classList.add("text-center", "text-gray-500");
+          tr.innerHTML = `<td colspan="5" class="py-6">Belum ada catatan keuangan.</td>`;
+          catatanList.appendChild(tr);
+          updateTotals();
+          return;
+        }
+
+        catatanData.forEach((item, index) => {
+          const tr = document.createElement("tr");
+          tr.classList.add("hover:bg-gray-50");
+
+          // Join keterangan and harga pairs with line breaks
+          const keteranganFormatted = item.keterangan
+            .map((k) => escapeHtml(k))
+            .join("<br>");
+          const hargaFormatted = item.harga
+            .map((h) => formatRupiah(h))
+            .join("<br>");
+
+          tr.innerHTML = `
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${
+            item.tanggal
+          }</td>
+          <td class="px-4 py-3 whitespace-pre-line text-sm text-gray-700">${keteranganFormatted}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm ${
+            item.tipe === "pemasukan"
+              ? "text-green-600 font-semibold"
+              : "text-red-600 font-semibold"
+          } capitalize">${item.tipe}</td>
+          <td class="px-4 py-3 whitespace-pre-line text-sm text-right text-gray-700">${hargaFormatted}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-center text-sm">
+            <button data-index="${index}" aria-label="Hapus catatan" title="Hapus catatan" class="text-red-600 hover:text-red-800 focus:outline-none">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        `;
+          catatanList.appendChild(tr);
+        });
+        updateTotals();
+      }
+
+      function updateTotals() {
+        const totalPemasukan = catatanData
+          .filter((item) => item.tipe === "pemasukan")
+          .reduce((acc, cur) => acc + cur.harga.reduce((a, b) => a + b, 0), 0);
+        const totalPengeluaran = catatanData
+          .filter((item) => item.tipe === "pengeluaran")
+          .reduce((acc, cur) => acc + cur.harga.reduce((a, b) => a + b, 0), 0);
+        const saldoBersih = totalPemasukan - totalPengeluaran;
+
+        totalPemasukanEl.textContent = formatRupiah(totalPemasukan);
+        totalPengeluaranEl.textContent = formatRupiah(totalPengeluaran);
+        saldoBersihEl.textContent = formatRupiah(saldoBersih);
+      }
+
+      // Escape HTML to prevent injection
+      function escapeHtml(text) {
+        return text.replace(/[&<>"']/g, function (m) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[m];
+        });
+      }
+
+      function createCatatanInputRow() {
+        const div = document.createElement("div");
+        div.className = "flex gap-2 items-center";
+
+        const inputKeterangan = document.createElement("input");
+        inputKeterangan.type = "text";
+        inputKeterangan.name = "keterangan[]";
+        inputKeterangan.placeholder = "Contoh: Pembelian bahan baku";
+        inputKeterangan.required = true;
+        inputKeterangan.className =
+          "flex-grow border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+        const inputHarga = document.createElement("input");
+        inputHarga.type = "number";
+        inputHarga.name = "harga[]";
+        inputHarga.min = "0";
+        inputHarga.step = "1000";
+        inputHarga.placeholder = "Harga (Rp)";
+        inputHarga.required = true;
+        inputHarga.className =
+          "w-36 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.setAttribute("aria-label", "Hapus catatan");
+        removeBtn.title = "Hapus catatan";
+        removeBtn.className =
+          "bg-red-600 text-white px-3 rounded-md hover:bg-red-700 transition-colors flex items-center justify-center";
+        removeBtn.innerHTML = '<i class="fas fa-minus"></i>';
+
+        removeBtn.addEventListener("click", () => {
+          div.remove();
+        });
+
+        div.appendChild(inputKeterangan);
+        div.appendChild(inputHarga);
+        div.appendChild(removeBtn);
+        return div;
+      }
+
+      function resetCatatanInputs() {
+        catatanContainer.innerHTML = "";
+        const div = document.createElement("div");
+        div.className = "flex gap-2 items-center";
+
+        const inputKeterangan = document.createElement("input");
+        inputKeterangan.type = "text";
+        inputKeterangan.name = "keterangan[]";
+        inputKeterangan.placeholder = "Contoh: Pembelian bahan baku";
+        inputKeterangan.required = true;
+        inputKeterangan.className =
+          "flex-grow border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+        const inputHarga = document.createElement("input");
+        inputHarga.type = "number";
+        inputHarga.name = "harga[]";
+        inputHarga.min = "0";
+        inputHarga.step = "1000";
+        inputHarga.placeholder = "Harga (Rp)";
+        inputHarga.required = true;
+        inputHarga.className =
+          "w-36 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+        const addBtn = document.createElement("button");
+        addBtn.type = "button";
+        addBtn.id = "addCatatanBtn";
+        addBtn.setAttribute("aria-label", "Tambah catatan");
+        addBtn.title = "Tambah catatan";
+        addBtn.className =
+          "bg-green-600 text-white px-3 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center";
+        addBtn.innerHTML = '<i class="fas fa-plus"></i>';
+
+        addBtn.addEventListener("click", () => {
+          const newRow = createCatatanInputRow();
+          catatanContainer.appendChild(newRow);
+        });
+
+        div.appendChild(inputKeterangan);
+        div.appendChild(inputHarga);
+        div.appendChild(addBtn);
+        catatanContainer.appendChild(div);
+      }
+
+      // Initial setup
+      loadData();
+      renderList();
+      resetCatatanInputs();
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const tanggal = form.tanggal.value;
+        const tipe = form.tipe.value;
+
+        const keteranganInputs = form.querySelectorAll(
+          'input[name="keterangan[]"]'
+        );
+        const hargaInputs = form.querySelectorAll('input[name="harga[]"]');
+
+        const keteranganValues = [];
+        const hargaValues = [];
+
+        for (let i = 0; i < keteranganInputs.length; i++) {
+          const k = keteranganInputs[i].value.trim();
+          const h = hargaInputs[i].value.trim();
+
+          if (!k) {
+            alert("Mohon isi semua keterangan dengan benar.");
+            return;
+          }
+          if (!h || isNaN(h) || Number(h) < 0) {
+            alert("Mohon isi semua harga dengan benar.");
+            return;
+          }
+          keteranganValues.push(k);
+          hargaValues.push(Number(h));
+        }
+
+        if (!tanggal || !tipe) {
+          alert("Mohon isi semua field dengan benar.");
+          return;
+        }
+
+        catatanData.push({
+          tanggal,
+          keterangan: keteranganValues,
+          tipe,
+          harga: hargaValues,
+        });
+        saveData();
+        renderList();
+        form.reset();
+        resetCatatanInputs();
+        form.tanggal.focus();
+      });
+
+      catatanList.addEventListener("click", (e) => {
+        if (e.target.closest("button")) {
+          const btn = e.target.closest("button");
+          const index = btn.getAttribute("data-index");
+          if (index !== null) {
+            catatanData.splice(index, 1);
+            saveData();
+            renderList();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
